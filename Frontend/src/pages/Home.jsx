@@ -50,7 +50,8 @@ export default function Home() {
             Keeping an Eye on Every Price.
           </p>
         <button
-          onClick={() => navigate("/document")} // Fixed: router.push ki jagah navigate use kiya
+          // Fixed: router.push ki jagah navigate use kiya
+          onClick={() => navigate("/submit-url")}
           className="px-6 py-3 rounded-full text-white font-semibold text-lg shadow-xl 
              bg-gradient-to-r from-[#2979FF] via-[#FF80AB] to-[#FFD600]
              hover:from-[#FF6D00] hover:to-[#00E676]

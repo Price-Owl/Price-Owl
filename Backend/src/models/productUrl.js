@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 const ProductUrlSchema = new mongoose.Schema({
     userId: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "UserSchema",
+        ref: "User",
         required: true  
     },
     productUrl: {

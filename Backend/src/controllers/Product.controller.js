@@ -11,6 +11,7 @@ async function submitUrlController(req, res) {
                 message: "Invalid user"
             })
         }
+        console.log("user::", user);
         const {productUrl} = req.body;
         if(!productUrl){
             return res.status(401).json({
@@ -33,6 +34,8 @@ async function submitUrlController(req, res) {
             productUrl: productUrl
         })
 
+        await priceTrackController(productUrl);
+
         return res.status(200).json({
             success: true,
             message: "Url submitted successfull, waiting for price drop."
@@ -45,6 +48,42 @@ async function submitUrlController(req, res) {
     }
 } 
 
+const getAllMyLinksController = async (req, res) => {
+    try {
+        const user = await User.findById(req.user.id);
+        if(!user){
+            return res.status(500).json({
+                success: false,
+                message: "Invalid user."
+            })
+        }
+        const productUrls = await ProductUrlSchema.find({
+            userId: user._id,
+        })
+
+        return res.status(200).json({
+            success: true,
+            message: "All links fetched successfully",
+            productUrls: productUrls
+        })
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message:"Internal server error."
+        })
+    }
+}
+
+const priceTrackController = async (productUrl) => {
+    try {
+        console.log("recievedUrl::", productUrl);
+    } catch (error) {
+        console.log("Error in pricetrackcontroller::", error);
+    }
+}
+
 module.exports = {
-    submitUrlController
+    submitUrlController,
+    getAllMyLinksController,
+    priceTrackController
 }
