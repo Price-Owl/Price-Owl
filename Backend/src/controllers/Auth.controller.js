@@ -37,14 +37,14 @@ const registerUserController = async  (req, res) => {
             password: hashedPassword
         })
 
-        return res.status(400).json({
+        return res.status(201).json({
             success: true,
             message: "User registered successfully."
         })
     } catch (error) {
-        return res.status(200).json({
+        return res.status(500).json({
             success: false,
-            message: "Error in registering the user"
+            message: "Internal Server error"
         })
     }
 }
@@ -77,6 +77,7 @@ const loginUserController = async (req, res) => {
         }
         //all clear now token generate
         const token = jwt.sign({
+            id: user._id,
             name: user.name,
             email: user.email,
         }, process.env.JWT_SECRET,
@@ -87,19 +88,47 @@ const loginUserController = async (req, res) => {
       secure: true,      // Set to true if using HTTPS
       sameSite: "lax",    // Helps protect against CSRF
       maxAge: 24 * 60 * 60 * 1000 // 1 day
-    }).json({
+    }).status(200).json({
         success: true,
         message: "User logged in successfully."
     })
     } catch (error) {
-        return res.status(200).json({
+        return res.status(500).json({
             success: false,
-            message: "Error in login the user."
+            message: "Internal Server error"
+        })
+    }
+}
+
+const getMeController = async (req, res) => {
+    try {
+        const user = await User.findById(req.user.id)
+                               .select("-password");
+
+
+        if(!user) {
+            return res.status(401).json({
+                success: false,
+                message: "Invalid user."
+            })
+        }
+
+        return res.status(200).json({
+            success: true,
+            message: "User details fetched successfully.",
+            user
+        })
+
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: "Internal Server error"
         })
     }
 }
 
 module.exports = {
     registerUserController,
-    loginUserController
+    loginUserController,
+    getMeController
 }
