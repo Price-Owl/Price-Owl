@@ -11,7 +11,8 @@ const NavBar = () => {
   const location = useLocation(); // Next.js usePathname ki jagah
   const pathname = location.pathname;
 
-  const {user} = useAuth();
+  const context = useContext(AuthContext);
+  const {user} = context;
 
   // Fake auth variables (Next.js Clerk variables ko replace karne ke liye taaki code crash na ho)
   // Jab aap Firebase/Supabase/Context API use karo, toh inko true/false state se pass kar dena
@@ -219,18 +220,31 @@ const NavBar = () => {
               </div>
             ) : (
               <div className="space-y-3">
-                <button
-                  onClick={() => navigate("/sign-in")}
+                {
+                  !user && (<button
+                  onClick={() => navigate("/login")}
                   className="w-full bg-white/5 border border-white/10 text-white px-4 py-3 rounded-lg font-medium hover:bg-white/10 transition-colors"
                 >
-                  Sign In
-                </button>
-                <button
-                  onClick={() => navigate("/sign-up")}
+                  Login
+                </button>) 
+                }
+                {
+                  user ? (
+                    <button
+                  onClick={() => navigate("/submit-url")}
                   className="w-full bg-gradient-to-r from-purple-500 to-indigo-500 text-white px-4 py-3 rounded-lg font-medium hover:shadow-lg transition-all"
                 >
                   Get Started Free
                 </button>
+                  ) : (
+                    <button
+                  onClick={() => navigate("/login")}
+                  className="w-full bg-gradient-to-r from-purple-500 to-indigo-500 text-white px-4 py-3 rounded-lg font-medium hover:shadow-lg transition-all"
+                >
+                  Get Started Free
+                </button>
+                  )
+                }
               </div>
             )}
           </div>

@@ -94,7 +94,8 @@ const loginUserController = async (req, res) => {
       maxAge: 24 * 60 * 60 * 1000 // 1 day
     }).status(200).json({
         success: true,
-        message: "User logged in successfully."
+        message: "User logged in successfully.",
+        user
     })
     } catch (error) {
         return res.status(500).json({
