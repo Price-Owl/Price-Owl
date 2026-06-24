@@ -1,17 +1,19 @@
 import React, { useState, useEffect } from "react";
 // Next.js ke navigation ke jagah standard React Router hooks use honge
 import { useNavigate, useLocation } from "react-router-dom";
-import applogo from "../assets/logoNoBg.png"
+import applogo from "../assets/priceowllogoo.png"
+import { useAuth } from "../hooks/useAuth";
 
 const NavBar = () => {
   const navigate = useNavigate(); // Next.js useRouter ki jagah
   const location = useLocation(); // Next.js usePathname ki jagah
   const pathname = location.pathname;
 
+  const {user} = useAuth();
+
   // Fake auth variables (Next.js Clerk variables ko replace karne ke liye taaki code crash na ho)
   // Jab aap Firebase/Supabase/Context API use karo, toh inko true/false state se pass kar dena
   const isSignedIn = false; 
-  const user = null;
 
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -53,7 +55,7 @@ const NavBar = () => {
                 <img
                   src={applogo}
                   alt="App logo"
-                  className="w-10 h-10 object-contain"
+                  className="w-15 h-15 object-contain"
                 />
                 <div
                   className={`caprasimo-regular text-2xl md:text-3xl font-extrabold tracking-tight transition-colors duration-300 ${
@@ -120,16 +122,21 @@ const NavBar = () => {
                 </>
               ) : (
                 <>
-                  <button
-                    onClick={() => navigate("/sign-in")}
+                  {
+                    !user && (
+                      <button
+                    onClick={() => navigate("/login")}
                     className={`font-medium px-4 py-2 rounded-lg text-sm transition-all ${
                       scrolled ? "text-gray-300 hover:text-white" : "text-white hover:text-gray-200"
                     }`}
                   >
-                    Sign In
+                    Login
                   </button>
-                  <button
-                    onClick={() => navigate("/sign-up")}
+                    )
+                  }
+                 {!user ?  (
+                   <button
+                    onClick={() => navigate("/login")}
                     className="relative group"
                   >
                     <div className="absolute inset-0 bg-gradient-to-r from-purple-500 to-indigo-500 rounded-lg blur opacity-75 group-hover:opacity-100 transition duration-200"></div>
@@ -137,6 +144,17 @@ const NavBar = () => {
                       Get Started Free
                     </div>
                   </button>
+                 ) :
+                 (<button
+                    onClick={() => navigate("/submit-url")}
+                    className="relative group"
+                  >
+                    <div className="absolute inset-0 bg-gradient-to-r from-purple-500 to-indigo-500 rounded-lg blur opacity-75 group-hover:opacity-100 transition duration-200"></div>
+                    <div className="relative bg-white text-gray-900 px-4 py-2 rounded-lg text-sm font-medium hover:shadow-lg transition-all duration-200">
+                      Get Started Free
+                    </div>
+                  </button>)
+                }
                 </>
               )}
             </div>

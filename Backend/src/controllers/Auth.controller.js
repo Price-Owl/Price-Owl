@@ -9,7 +9,7 @@ const registerUserController = async  (req, res) => {
         const {name, email, password, confirmPassword} = req.body;
         //validate input
         if(!name || !email || !password || !confirmPassword) {
-            return res.status(200).json({
+            return res.status(400).json({
                 success: false,
                 message: "Please proide all the details."
             })
@@ -17,35 +17,39 @@ const registerUserController = async  (req, res) => {
         //check if the user is already exists or not
         const user = await User.findOne({email:email});
         if(user) {
-            return res.status(404).json({
+            return res.status(409).json({
                 success: false,
                 message: "User already registered, please login."
             })
         }
         //password check
         if(confirmPassword!=password){
-            return res.status(404).json({
+            return res.status(400).json({
                 success: false,
                 message: "Incorrect password."
             })
         }
         //hash the password
         const hashedPassword = await bcrypt.hash(password, 10);
-        await User.create({
+        const newUser=await User.create({
             name,
             email,
             password: hashedPassword
         })
+        console.log("newUser::", newUser);
 
         return res.status(201).json({
             success: true,
-            message: "User registered successfully."
+            message: "User registered successfully.",
+            user: newUser
         })
     } catch (error) {
-        return res.status(500).json({
-            success: false,
-            message: "Internal Server error"
-        })
+       console.log("REGISTER ERROR =>", error);
+
+    return res.status(500).json({
+        success: false,
+        message: error.message
+    })
     }
 }
 
@@ -55,7 +59,7 @@ const loginUserController = async (req, res) => {
         const {email, password} = req.body;
         //validate input
         if(!email || !password) {
-            return res.status(200).json({
+            return res.status(400).json({
                 success: false,
                 message: "Please provide all the deatils."
             })

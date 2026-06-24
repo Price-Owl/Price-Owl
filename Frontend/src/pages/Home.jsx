@@ -4,10 +4,14 @@ import { useEffect, useState } from "react";
 import AnimatedGradientBackground from "../components/animated-gradient-bg";
 import { DotLottieReact } from "@lottiefiles/dotlottie-react";
 import NavBar from "../components/Navbar";
+import { useAuth } from "../hooks/useAuth";
+import LoadingScreen from "../components/LoadinsScreen";
 
 export default function Home() {
   const [isMobile, setIsMobile] = useState(false);
   const navigate = useNavigate(); // Fixed: router ki jagah navigate use hoga
+
+  const {user, loading} = useAuth();
 
   useEffect(() => {
     const handleResize = () => {
@@ -22,13 +26,17 @@ export default function Home() {
     };
   }, []);
 
+  if(loading) {
+    return <LoadingScreen/>
+  }
+
   return (
-    <div className="min-h-screen w-screen bg-black text-white flex flex-col items-center">
+    <div className="min-h-screen w-full overflow-x-hidden bg-black text-white flex flex-col items-center">
       <NavBar />
       <div>
         <AnimatedGradientBackground />
       </div>
-      <div className="main w-full h-screen flex flex-col items-center gap-4 z-30 pt-20">
+      <div className="relative z-30 w-full min-h-[90vh] flex flex-col items-center justify-center gap-4 px-4 pt-12 md:pt-16 -translate-y-20">
         <div>
           {/* Fixed: Delay aur duration attributes normal div se hata diye taaki React warning na de */}
         {/* Lottie Container - Even smaller and strictly maintaining aspect ratio */}
@@ -43,13 +51,15 @@ export default function Home() {
   </div>
 </div>
         </div>
-        <h1 className="caprasimo-regular text-8xl text-center">
+        <h1 className="caprasimo-regular text-5xl sm:text-6xl md:text-7xl lg:text-8xl text-center">
           Price<span className="text-blue-500 group-hover:text-blue-500 transition-colors">Owl</span>
         </h1>
           <p className="caprasimo-regular text-center text-4xl">
             Keeping an Eye on Every Price.
           </p>
-        <button
+          {
+            user ? (
+              <button
           // Fixed: router.push ki jagah navigate use kiya
           onClick={() => navigate("/submit-url")}
           className="px-6 py-3 rounded-full text-white font-semibold text-lg shadow-xl 
@@ -59,6 +69,19 @@ export default function Home() {
         >
           Get Started with PriceOwl.
         </button>
+            ):(
+              <button
+          // Fixed: router.push ki jagah navigate use kiya
+          onClick={() => navigate("/register")}
+          className="px-6 py-3 rounded-full text-white font-semibold text-lg shadow-xl 
+             bg-gradient-to-r from-[#2979FF] via-[#FF80AB] to-[#FFD600]
+             hover:from-[#FF6D00] hover:to-[#00E676]
+             transition-all duration-300 hover:scale-105 mx-auto border-2 border-white" 
+        >
+          Get Started with PriceOwl.
+        </button>
+            )
+          }
       </div>
       {/* Section 1: Collaboration */}
       <div className="w-[90%] md:w-[80%] mx-auto flex flex-col md:flex-row items-center justify-between py-24 gap-10">
@@ -81,7 +104,7 @@ export default function Home() {
         <iframe
           width={isMobile ? 300 : 500}
           height={isMobile ? 300 : 500}
-          src="https://lottie.host/embed/555f627d-55e4-4086-9768-ba3e8647e511/9H0QXELsKV.json"
+          src="https://lottie.host/embed/7d4fa3c8-20d2-4c75-bac7-4d0450deab28/xZfHtqYC0p.lottie"
           className="rounded-xl shadow-xl"
         ></iframe>
         <h1 className="w-full md:w-[45%] text-4xl md:text-6xl font-bold text-white text-center md:text-left leading-tight">
@@ -102,12 +125,23 @@ export default function Home() {
           Monitor, track, and capture price drops from mobile, tablet, or desktop —
           anytime, anywhere.
         </p>
-        <button
-          onClick={() => navigate("/document")}
+        {
+          user ? (
+            <button
+          onClick={() => navigate("/submit-url")}
           className="bg-gradient-to-r from-teal-400 to-blue-500 hover:from-blue-500 hover:to-purple-500 text-white font-semibold px-6 py-3 rounded-xl shadow-lg transition-transform hover:scale-105"
         >
           Track Price
         </button>
+          ) : (
+            <button
+          onClick={() => navigate("/register")}
+          className="bg-gradient-to-r from-teal-400 to-blue-500 hover:from-blue-500 hover:to-purple-500 text-white font-semibold px-6 py-3 rounded-xl shadow-lg transition-transform hover:scale-105"
+        >
+          Track Price
+        </button>
+          )
+        }
       </div>
 
       {/* Footer */}
