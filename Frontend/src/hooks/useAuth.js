@@ -1,9 +1,32 @@
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import { AuthContext } from "../auth.context";
 import { login, register } from "../services/auth.api";
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
+
+  useEffect(() => {
+    async function fetchUser() {
+      try {
+        const response = await getMe();
+
+        console.log("GET ME RESPONSE:", response);
+
+        if (response.success) {
+          setUser(response.user);
+        } else {
+          setUser(null);
+        }
+      } catch (error) {
+        console.log("Auth Error:", error);
+        setUser(null);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchUser();
+  }, );
 
   if (!context) {
     throw new Error("useAuth must be used inside AuthProvider");

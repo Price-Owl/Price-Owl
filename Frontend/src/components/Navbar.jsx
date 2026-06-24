@@ -11,7 +11,7 @@ const NavBar = () => {
   const location = useLocation(); // Next.js usePathname ki jagah
   const pathname = location.pathname;
 
-  const {user} = useContext(AuthContext);
+  const {user} = useAuth();
 
   // Fake auth variables (Next.js Clerk variables ko replace karne ke liye taaki code crash na ho)
   // Jab aap Firebase/Supabase/Context API use karo, toh inko true/false state se pass kar dena

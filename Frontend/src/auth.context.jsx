@@ -9,29 +9,6 @@ export const AuthProvider = ({ children }) => {
   // Initially loading true rakho
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    async function fetchUser() {
-      try {
-        const response = await getMe();
-
-        console.log("GET ME RESPONSE:", response);
-
-        if (response.success) {
-          setUser(response.user);
-        } else {
-          setUser(null);
-        }
-      } catch (error) {
-        console.log("Auth Error:", error);
-        setUser(null);
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    fetchUser();
-  }, []);
-
   return (
     <AuthContext.Provider
       value={{
