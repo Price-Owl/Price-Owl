@@ -32,8 +32,8 @@ function list_users_with_read_access {
 
     #fetch the list of collaborators on the repository
     # collaborators="$(github_api_get "$endpoint" "  --> this will give original json response
-    # collaborators="$(github_api_get "$endpoint" "
-    collaborators="$(github_api_get "$endpoint" | jq -r '.[] | select(.permission.pull == true) | .login')"
+    # collaborators="$(github_api_get "$endpoint" | jq -r '.[] | select(.permission.pull == true) | .login')"
+    collaborators="$(github_api_get "$endpoint")"
 
     #display the list of collaborators with read acccess
     if [[ -z "$collaborators" ]]; then

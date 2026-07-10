@@ -16,6 +16,18 @@ const UserSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  urlsId:[
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "ProductUrl"
+    }
+  ],
+  urls:[
+    {
+      type: String,
+      required: true
+    }
+  ]
 });
 
 module.exports = mongoose.model("User", UserSchema);
