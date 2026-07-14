@@ -22,12 +22,6 @@ const UserSchema = new mongoose.Schema({
       ref: "ProductUrl"
     }
   ],
-  urls:[
-    {
-      type: String,
-      required: true
-    }
-  ]
 });
 
 module.exports = mongoose.model("User", UserSchema);

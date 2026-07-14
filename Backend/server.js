@@ -1,6 +1,6 @@
 const dns = require('dns');
 dns.setDefaultResultOrder('ipv4first');
-const startCron = require("./cron/cron");
+const startCron = require("./src/cron/cron");
 
 const dotenv = require("dotenv");
 dotenv.config();

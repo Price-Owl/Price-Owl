@@ -3,6 +3,7 @@ const StealthPlugin = require('puppeteer-extra-plugin-stealth');
 puppeteer.use(StealthPlugin());
 const ProductUrlSchema = require("../models/productUrl");
 const User = require("../models/User");
+const Tracking = require("../models/Tracking");
 
 async function submitUrlController(req, res) {
     try {
@@ -20,15 +21,6 @@ async function submitUrlController(req, res) {
             return res.status(400).json({
                 success: false,
                 message: "Please provide a product URL."
-            });
-        }
-
-        //check wheteher the user had already submitted the same url or not
-        const existingTrack = await ProductUrlSchema.findOne({ userId: user._id, productUrl });
-        if (existingTrack) {
-            return res.status(400).json({
-                success: false,
-                message: "You have already submitted this product URL."
             });
         }
 
@@ -51,22 +43,41 @@ async function submitUrlController(req, res) {
             });
         }
 
-        // 4. Save to Database (Including the title and price we just scraped)
-        const newProductTrack = await ProductUrlSchema.create({
-            userId: user._id,
+        //check if the link already submitted by the user or the another user 
+        //producturl schema me unique products links add honge, taaki cronjob repititive task na kare
+        //har 12 ghante me ek baar pure producturl schema pe web scrapping kre and jis jis user ke list me ye links honge un sb ko email bhej denge
+        const existingProduct = await ProductUrlSchema.findOne({productUrl:productUrl});
+        if(existingProduct){
+            await Tracking.create({
+                userId: user._id,
+                productId: existingProduct._id,
+            })
+            if(productData.price<existingProduct.currentPrice){
+                await ProductUrlSchema.findOneAndUpdate({productUrl},
+                    {
+                        currentPrice: productData.price
+                    }
+                )
+            }
+        }
+        else{
+            // 4. Save to Database (Including the title and price we just scraped)
+            const newProductTrack = await ProductUrlSchema.create({
             productUrl: productUrl,
             // Assuming your schema supports these fields. If not, edit accordingly:
             productName: productData.title,
             currentPrice: productData.price,
-            initialPrice: productData.price,
-        });
-
-        await User.findByIdAndUpdate(user._id, {
-            $push: { urlsId: newProductTrack._id },
-        });
-        await User.findByIdAndUpdate(user._id, {
-            $push: { urls: productUrl }
-        });
+            });
+            await ProductUrlSchema.findOneAndUpdate(
+                {productUrl},
+                {
+                    $push: {price: productData.price}
+                }
+            )
+            await User.findByIdAndUpdate(user._id, {
+                $push: { urlsId: newProductTrack._id },
+            });
+        }
 
         return res.status(200).json({
             success: true,
@@ -104,7 +115,12 @@ const currentPriceTrackController = async (productUrl) => {
     // Set a modern User-Agent to help bypass basic bot detection
     await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36');
     await page.setViewport({ width: 1280, height: 800 });
+console.log("Opening:", productUrl);
 
+await page.goto(productUrl, {
+    waitUntil: "domcontentloaded",
+    timeout: 60000,
+});
     await page.goto(productUrl, {
         waitUntil: "networkidle2",
         timeout: 60000 // 60s timeout limit
@@ -254,5 +270,6 @@ const getAllMyLinksController = async (req, res) => {
 
 module.exports = {
     submitUrlController,
-    getAllMyLinksController
+    getAllMyLinksController,
+    currentPriceTrackController
 };

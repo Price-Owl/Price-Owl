@@ -1,11 +1,14 @@
+//isme sirf unique products ke links add honge
 const mongoose = require('mongoose');
+const User = require("../models/User");
 
 const productUrlSchema = new mongoose.Schema({
-    userId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
-        required: true
-    },
+    // allUsers:[
+    //     {
+    //         type: mongoose.Schema.Types.ObjectId,
+    //         ref: "User"
+    //     }
+    // ],
     productUrl: {
         type: String,
         required: true,
@@ -20,14 +23,10 @@ const productUrlSchema = new mongoose.Schema({
         type: Number,  // Stored as a Number for easy calculations
         required: true
     },
-    initialPrice: {
-        type: Number,  // Keep track of the original price when submitted
-        required: true
-    },
-    priceHistory: [
+    price:[
         {
-            price: Number,
-            date: { type: Date, default: Date.now }
+        type: Number,
+        required: true
         }
     ]
 }, { timestamps: true });
