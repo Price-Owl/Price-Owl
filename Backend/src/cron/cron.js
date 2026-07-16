@@ -6,7 +6,6 @@ const startCron = () => {
         priceTracking();
         // console.log("Cron Job Running:", new Date().toLocaleString());
     });
-
     console.log("Cron Started");
 };
 

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 // Next.js ke navigation ke jagah standard React Router hooks use honge
 import { useNavigate, useLocation } from "react-router-dom";
 import applogo from "../assets/priceowllogoo.png"
-import { useAuth } from "../hooks/useAuth";
+// import { useAuth } from "../hooks/useAuth";
 import { useContext } from "react";
 import { AuthContext } from "../auth.context";
 

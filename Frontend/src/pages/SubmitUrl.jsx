@@ -1,21 +1,34 @@
 import React, { useState } from "react";
 import AnimatedGradientBackground from "../components/animated-gradient-bg";
 import NavBar from "../components/Navbar";
-import { useAuth } from "../hooks/useAuth";
+import toast from "react-hot-toast";
+import { urlSubmit } from "../hooks/urlSubmit";
 import { useNavigate } from "react-router";
 
 const SubmitUrl = () => {
   const [productUrl, setProductUrl] = useState("");
 
-  const { loading } = useAuth();
+  const { loading, handleSubmitUrl, productTitle, price } = urlSubmit();
   const navigate = useNavigate();
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    console.log(productUrl);
+    // api calling 
+    try {
+        const response = await handleSubmitUrl({productUrl});
 
-    // API Call Here
+        if (response?.success) {
+          toast.success("URL submitted successfully.");
+          navigate("/");
+        } else {
+          toast.error(response.message);
+        }
+    } catch (error) {
+        console.error(error);
+        toast.error("Something went wrong.");
+      }
   };
 
   return (

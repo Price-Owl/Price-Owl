@@ -5,6 +5,8 @@ export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
+  const [productTitle, setProductTitle] = useState("");
+  const [price,setPrice] = useState(0);
 
   // loading ko pehle declare karo
   const [loading, setLoading] = useState(true);
