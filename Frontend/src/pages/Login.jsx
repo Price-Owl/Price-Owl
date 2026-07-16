@@ -8,7 +8,7 @@ import { DotLottieReact } from "@lottiefiles/dotlottie-react";
 
 const Login = () => {
   const navigate = useNavigate();
-  const { loading, setLoadin, handleLogin } = useAuth();
+  const { loading, handleLogin } = useAuth();
 
   const [formData, setFormData] = useState({
     email: "",

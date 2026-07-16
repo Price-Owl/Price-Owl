@@ -1,4 +1,5 @@
-# 🦉 PriceOwl
+# <img width="70" height="50" alt="Screenshot 2026-06-15 150723" src="https://github.com/user-attachments/assets/6673efec-6afa-44b5-8423-cf163b2a991d" />
+ PriceOwl
 
 PriceOwl is a full-stack MERN application that helps users track product prices from Amazon and Flipkart. Simply paste a product URL, and PriceOwl will continuously monitor its price. Whenever the price drops, users automatically receive an email notification with the latest product price.
 
