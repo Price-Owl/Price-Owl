@@ -30,7 +30,7 @@ const Register = () => {
 
     // API call here
     const response = await handleRegister(formData);
-    if(response.success){
+    if(response?.success){
       toast.success("User regsitered successfully.")
       navigate("/login");
     } else{

@@ -54,3 +54,18 @@ export async function getMe() {
     };
     }
 }
+
+export async function submitUrl({productUrl}){
+    try {
+        const response = await api.post("/api/product/submit-url", {
+            productUrl
+        });
+        // console.log("response::", response);
+        return response.data;
+    } catch (error) {
+        return {
+        success: false,
+        message: error.response?.data?.message || "Something went wrong, please try again."
+    };
+    }
+}
