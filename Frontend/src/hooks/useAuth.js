@@ -72,9 +72,9 @@ export const useAuth = () => {
   };
 
   return {
-    user,
-    loading,
     handleRegister,
     handleLogin,
+    user,
+    loading
   };
 };
