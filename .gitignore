@@ -1,8 +1,3 @@
 Backend/.env
-<<<<<<< HEAD
-Backend/node_modules
-Frontend/node_modules
-=======
-node_modules/
-Backend/node_modules
->>>>>>> 4f28c0d58568b29b8712fe8a7ff13e6bb3de7abe
+Backend/node_modules/
+Frontend/node_modules/

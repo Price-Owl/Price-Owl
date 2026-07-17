@@ -18,7 +18,7 @@ const SubmitUrl = () => {
     // api calling 
     try {
         const response = await handleSubmitUrl({productUrl});
-
+        console.log("Response:", response);
         if (response?.success) {
           toast.success("URL submitted successfully.");
           navigate("/");

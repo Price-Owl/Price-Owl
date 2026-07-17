@@ -1,6 +1,7 @@
 const User = require("../models/User");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const { sendLoginSuccessEmail } = require("../utils/mailSender");
 
 //register na dlogin controller working fine
 const registerUserController = async  (req, res) => {
@@ -86,6 +87,7 @@ const loginUserController = async (req, res) => {
             email: user.email,
         }, process.env.JWT_SECRET,
     {expiresIn:"1d"})
+    await sendLoginSuccessEmail(user.email, user.name);
 
     return res.cookie("token", token,{
       httpOnly: true,     // Prevents JS access (more secure)

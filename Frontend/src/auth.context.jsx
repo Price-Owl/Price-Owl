@@ -41,6 +41,10 @@ export const AuthProvider = ({ children }) => {
         setUser,
         loading,
         setLoading,
+        productTitle,
+        setProductTitle,
+        price,
+        setPrice
       }}
     >
       {children}

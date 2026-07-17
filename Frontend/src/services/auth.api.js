@@ -68,8 +68,6 @@ export async function submitUrl({productUrl}){
         message: error.response?.data?.message || "Something went wrong, please try again."
     };
     }
-<<<<<<< HEAD
+
 }
-=======
-}
->>>>>>> 4f28c0d58568b29b8712fe8a7ff13e6bb3de7abe
+
