@@ -99,28 +99,32 @@ async function submitUrlController(req, res) {
 const currentPriceTrackController = async (productUrl) => {
   let browser;
   try {
-    // Launch browser (headless: true for background API execution)
-    browser = await puppeteer.launch({
-      executablePath: "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe", // Keep if pointing to local Chrome, remove if using Puppeteer's bundled Chromium
+    const launchOptions = {
       headless: "new", // "new" or true (highly recommended for production servers)
       args: [
         '--no-sandbox',
         '--disable-setuid-sandbox',
         '--disable-dev-shm-usage',
       ]
-    });
+    };
 
+    // Dynamically set executablePath so it works on local Windows AND Render
+    if (process.env.PUPPETEER_EXECUTABLE_PATH) {
+        launchOptions.executablePath = process.env.PUPPETEER_EXECUTABLE_PATH;
+    } else if (process.platform === 'win32') {
+        launchOptions.executablePath = "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe";
+    }
+
+    browser = await puppeteer.launch(launchOptions);
     const page = await browser.newPage();
 
     // Set a modern User-Agent to help bypass basic bot detection
     await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36');
     await page.setViewport({ width: 1280, height: 800 });
-console.log("Opening:", productUrl);
+    
+    console.log("Opening URL:", productUrl);
 
-await page.goto(productUrl, {
-    waitUntil: "domcontentloaded",
-    timeout: 60000,
-});
+    // FIXED: Combined the duplicate page.goto calls into a single navigation call
     await page.goto(productUrl, {
         waitUntil: "networkidle2",
         timeout: 60000 // 60s timeout limit
@@ -154,6 +158,7 @@ await page.goto(productUrl, {
                             const found = findProductNode(item);
                             if (found) return found;
                         }
+                        return null; // Return early for arrays to avoid re-evaluating keys
                     }
                     if (obj['@type'] === 'Product') return obj;
                     if (obj['@graph']) return findProductNode(obj['@graph']);
@@ -239,7 +244,11 @@ await page.goto(productUrl, {
   } finally {
     // ALWAYS close the browser in the finally block to prevent RAM leaks
     if (browser) {
-      await browser.close();
+      try {
+        await browser.close();
+      } catch (closeError) {
+        console.error("Error closing browser:", closeError);
+      }
     }
   }
 };
@@ -273,3 +282,152 @@ module.exports = {
     getAllMyLinksController,
     currentPriceTrackController
 };
+
+//working onlocalhost
+// const currentPriceTrackController = async (productUrl) => {
+//   let browser;
+//   try {
+//     // Launch browser (headless: true for background API execution)
+//     browser = await puppeteer.launch({
+//       executablePath: "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe", // Keep if pointing to local Chrome, remove if using Puppeteer's bundled Chromium
+//       headless: "new", // "new" or true (highly recommended for production servers)
+//       args: [
+//         '--no-sandbox',
+//         '--disable-setuid-sandbox',
+//         '--disable-dev-shm-usage',
+//       ]
+//     });
+
+//     const page = await browser.newPage();
+
+//     // Set a modern User-Agent to help bypass basic bot detection
+//     await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36');
+//     await page.setViewport({ width: 1280, height: 800 });
+// console.log("Opening:", productUrl);
+
+// await page.goto(productUrl, {
+//     waitUntil: "domcontentloaded",
+//     timeout: 60000,
+// });
+//     await page.goto(productUrl, {
+//         waitUntil: "networkidle2",
+//         timeout: 60000 // 60s timeout limit
+//     });
+
+//     // Extract title and price dynamically using standard schema patterns, meta tags, or css fallbacks
+//     const productData = await page.evaluate(() => {
+//         const cleanPrice = (val) => {
+//             if (!val) return null;
+//             // Strip currency symbols, commas, spaces and parse to number
+//             const cleaned = val.replace(/[^\d.]/g, '');
+//             const num = parseFloat(cleaned);
+//             return isNaN(num) ? null : num;
+//         };
+
+//         const cleanTitle = (text) => {
+//             return text ? text.trim().replace(/\s+/g, ' ') : null;
+//         };
+
+//         // --- METHOD 1: Parse JSON-LD (Search engine markup, most reliable) ---
+//         const jsonLdScripts = document.querySelectorAll('script[type="application/ld+json"]');
+//         for (const script of jsonLdScripts) {
+//             try {
+//                 const data = JSON.parse(script.textContent);
+
+//                 // Helper to search recursively for '@type: Product' in JSON-LD objects
+//                 const findProductNode = (obj) => {
+//                     if (!obj || typeof obj !== 'object') return null;
+//                     if (Array.isArray(obj)) {
+//                         for (const item of obj) {
+//                             const found = findProductNode(item);
+//                             if (found) return found;
+//                         }
+//                     }
+//                     if (obj['@type'] === 'Product') return obj;
+//                     if (obj['@graph']) return findProductNode(obj['@graph']);
+                    
+//                     for (const key of Object.keys(obj)) {
+//                         const found = findProductNode(obj[key]);
+//                         if (found) return found;
+//                     }
+//                     return null;
+//                 };
+
+//                 const productNode = findProductNode(data);
+//                 if (productNode) {
+//                     let title = productNode.name;
+//                     let price = null;
+//                     if (productNode.offers) {
+//                         const offers = Array.isArray(productNode.offers) ? productNode.offers : [productNode.offers];
+//                         for (const offer of offers) {
+//                             if (offer.price) {
+//                                 price = cleanPrice(offer.price.toString());
+//                                 break;
+//                             }
+//                         }
+//                     }
+//                     if (price) return { title: cleanTitle(title), price };
+//                 }
+//             } catch (e) { /* ignore JSON parsing errors */ }
+//         }
+
+//         // --- METHOD 2: Parse OpenGraph / Microdata HTML Meta Tags ---
+//         const metaPrice = document.querySelector('meta[property="og:price:amount"]') || 
+//                           document.querySelector('meta[property="product:price:amount"]') ||
+//                           document.querySelector('meta[itemprop="price"]');
+        
+//         const metaTitle = document.querySelector('meta[property="og:title"]') ||
+//                           document.querySelector('title');
+
+//         let extractedPrice = metaPrice ? cleanPrice(metaPrice.getAttribute('content')) : null;
+//         let extractedTitle = metaTitle ? cleanTitle(metaTitle.getAttribute('content') || metaTitle.textContent) : null;
+
+//         if (extractedPrice && extractedTitle) {
+//             return { title: extractedTitle, price: extractedPrice };
+//         }
+
+//         // --- METHOD 3: Fallback Store-Specific Selectors ---
+//         let title = null;
+//         let price = null;
+//         const currentUrl = window.location.href;
+
+//         if (currentUrl.includes('amazon.')) {
+//             const titleEl = document.querySelector('#productTitle');
+//             if (titleEl) title = titleEl.textContent;
+
+//             const priceEl = document.querySelector('.a-price-whole') || 
+//                             document.querySelector('#priceblock_ourprice') || 
+//                             document.querySelector('#priceblock_dealprice') ||
+//                             document.querySelector('.a-price .a-offscreen');
+//             if (priceEl) price = cleanPrice(priceEl.textContent);
+//         } else if (currentUrl.includes('flipkart.')) {
+//             const titleEl = document.querySelector('.VU-ZEc') || 
+//                             document.querySelector('.B_NuCI') || 
+//                             document.querySelector('h1');
+//             if (titleEl) title = titleEl.textContent;
+
+//             const priceEl = document.querySelector('.Nx9nXM') || 
+//                             document.querySelector('._30jeq3._16Jk6d') || 
+//                             document.querySelector('._30jeq3');
+//             if (priceEl) price = cleanPrice(priceEl.textContent);
+//         }
+
+//         return {
+//             title: cleanTitle(title),
+//             price: price
+//         };
+//     });
+
+//     console.log("Tracked Product Details:", productData);
+//     return productData;
+
+//   } catch (error) {
+//     console.error("Price Track Error:", error);
+//     return null;
+//   } finally {
+//     // ALWAYS close the browser in the finally block to prevent RAM leaks
+//     if (browser) {
+//       await browser.close();
+//     }
+//   }
+// };
