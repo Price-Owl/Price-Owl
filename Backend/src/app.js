@@ -10,7 +10,7 @@ app.use(cookieParser());
 app.use(cors({
     origin: [
         "http://localhost:5173",
-        "https://sumit-price-owl.vercel.app" // apna actual Vercel URL
+        "https://price-owl-olive.vercel.app" // apna actual Vercel URL
     ],
     credentials: true
 }));
