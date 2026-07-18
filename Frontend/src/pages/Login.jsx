@@ -32,6 +32,7 @@ const Login = () => {
     const response = await handleLogin(formData);
 
     if (response?.success) {
+      toast.success("Login successful!");
       navigate("/");
     } else {
       toast.error(response?.message || "Something went wrong");

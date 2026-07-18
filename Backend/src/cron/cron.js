@@ -2,7 +2,8 @@ const cron = require("node-cron");
 const { priceTracking } = require("../controllers/priceTracking.controller");
 
 const startCron = () => {
-    cron.schedule("0 */6 * * *", async () => {
+    // "0 */12 * * *" ka matlab hai har 12 ghante mein exact minute 0 par chalega (e.g. 12:00 AM aur 12:00 PM)
+    cron.schedule("0 */12 * * *", async () => {
         console.log("Cron Started:", new Date().toLocaleString());
 
         try {
