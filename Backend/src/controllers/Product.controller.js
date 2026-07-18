@@ -97,38 +97,78 @@ async function submitUrlController(req, res) {
 } 
 
 const currentPriceTrackController = async (productUrl) => {
-  let browser;
+//   let browser;
+//   try {
+//     const launchOptions = {
+//       headless: "new", // "new" or true (highly recommended for production servers)
+//       args: [
+//         '--no-sandbox',
+//         '--disable-setuid-sandbox',
+//         '--disable-dev-shm-usage',
+//       ]
+//     };
+
+//     // Dynamically set executablePath so it works on local Windows AND Render
+//     if (process.env.PUPPETEER_EXECUTABLE_PATH) {
+//         launchOptions.executablePath = process.env.PUPPETEER_EXECUTABLE_PATH;
+//     } else if (process.platform === 'win32') {
+//         launchOptions.executablePath = "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe";
+//     }
+
+//     browser = await puppeteer.launch(launchOptions);
+//     const page = await browser.newPage();
+
+//     // Set a modern User-Agent to help bypass basic bot detection
+//     await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36');
+//     await page.setViewport({ width: 1280, height: 800 });
+    
+//     console.log("Opening URL:", productUrl);
+
+//     // FIXED: Combined the duplicate page.goto calls into a single navigation call
+//     await page.goto(productUrl, {
+//         waitUntil: "networkidle2",
+//         timeout: 60000 // 60s timeout limit
+//     });
+
+let browser;
   try {
     const launchOptions = {
-      headless: "new", // "new" or true (highly recommended for production servers)
+      headless: "new", 
       args: [
         '--no-sandbox',
         '--disable-setuid-sandbox',
         '--disable-dev-shm-usage',
+        '--disable-gpu',
       ]
     };
-
-    // Dynamically set executablePath so it works on local Windows AND Render
     if (process.env.PUPPETEER_EXECUTABLE_PATH) {
         launchOptions.executablePath = process.env.PUPPETEER_EXECUTABLE_PATH;
     } else if (process.platform === 'win32') {
         launchOptions.executablePath = "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe";
     }
-
     browser = await puppeteer.launch(launchOptions);
     const page = await browser.newPage();
-
-    // Set a modern User-Agent to help bypass basic bot detection
+    // Set User-Agent
     await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36');
     await page.setViewport({ width: 1280, height: 800 });
+    // 🔥 OPTIMIZATION: Block images, stylesheets & fonts (Saves RAM & prevents frame detachment)
+    await page.setRequestInterception(true);
+    page.on('request', (req) => {
+        const resource = req.resourceType();
+        if (resource === 'image' || resource === 'stylesheet' || resource === 'font' || resource === 'media') {
+            req.abort();
+        } else {
+            req.continue();
+        }
+    });
     
     console.log("Opening URL:", productUrl);
-
-    // FIXED: Combined the duplicate page.goto calls into a single navigation call
+    // 🔥 CHANGED: Use "domcontentloaded" instead of "networkidle2" (Instant load & no crashes)
     await page.goto(productUrl, {
-        waitUntil: "networkidle2",
-        timeout: 60000 // 60s timeout limit
+        waitUntil: "domcontentloaded",
+        timeout: 60000 
     });
+
 
     // Extract title and price dynamically using standard schema patterns, meta tags, or css fallbacks
     const productData = await page.evaluate(() => {
