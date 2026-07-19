@@ -71,3 +71,15 @@ export async function submitUrl({productUrl}){
 
 }
 
+export async function myTrackingDetails(){
+    try {
+        const response = await api.get("/api/product/my-tracking-details");
+        return response.data;
+    } catch (error) {
+        return {
+        success: false,
+        message: error.response?.data?.message || "Something went wrong, please try again."
+    };
+    }
+}
+

@@ -138,7 +138,7 @@ const NavBar = () => {
                     )
                   }
                  {!user ?  (
-                   <button
+                    <button
                     onClick={() => navigate("/login")}
                     className="relative group"
                   >
@@ -146,9 +146,11 @@ const NavBar = () => {
                     <div className="relative bg-white text-gray-900 px-4 py-2 rounded-lg text-sm font-medium hover:shadow-lg transition-all duration-200">
                       Get Started Free
                     </div>
-                  </button>
+                  </button>         
                  ) :
-                 (<button
+                 (
+                  <div className="flex items-center gap-4">
+                       <button
                     onClick={() => navigate("/submit-url")}
                     className="relative group"
                   >
@@ -156,7 +158,19 @@ const NavBar = () => {
                     <div className="relative bg-white text-gray-900 px-4 py-2 rounded-lg text-sm font-medium hover:shadow-lg transition-all duration-200">
                       Get Started Free
                     </div>
-                  </button>)
+                  </button>
+
+                  <button
+                    onClick={() => navigate("/my-tracking-details")}
+                    className="relative group"
+                  >
+                    <div className="absolute inset-0 bg-gradient-to-r from-purple-500 to-indigo-500 rounded-lg blur opacity-75 group-hover:opacity-100 transition duration-200"></div>
+                    <div className="relative bg-white text-gray-900 px-4 py-2 rounded-lg text-sm font-medium hover:shadow-lg transition-all duration-200">
+                      Tracking Details
+                    </div>
+                  </button>
+                  </div>
+                  )
                 }
                 </>
               )}

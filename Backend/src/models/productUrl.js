@@ -3,12 +3,6 @@ const mongoose = require('mongoose');
 const User = require("../models/User");
 
 const productUrlSchema = new mongoose.Schema({
-    // allUsers:[
-    //     {
-    //         type: mongoose.Schema.Types.ObjectId,
-    //         ref: "User"
-    //     }
-    // ],
     productUrl: {
         type: String,
         required: true,
@@ -21,12 +15,20 @@ const productUrlSchema = new mongoose.Schema({
     },
     currentPrice: {
         type: Number,  // Stored as a Number for easy calculations
-        required: true
+        required: true,
+        createdAt: {
+            type: Date,
+            default: Date.now
+        }
     },
     price:[
         {
         type: Number,
-        required: true
+        required: true,
+        createdAt: {
+            type: Date,
+            default: Date.now
+        }
         }
     ]
 }, { timestamps: true });

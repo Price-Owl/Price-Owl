@@ -1,6 +1,6 @@
 import { useContext, useEffect } from "react";
 import { AuthContext } from "../auth.context";
-import {submitUrl} from "../services/auth.api";
+import { myTrackingDetails, submitUrl } from "../services/auth.api";
 
 export const urlSubmit = () => {
   const context = useContext(AuthContext);
@@ -15,29 +15,49 @@ export const urlSubmit = () => {
     productTitle,
     setProductTitle,
     price,
-    setPrice
+    setPrice,
+    myProductTrackingDetails,
+    setMyProductTrackingDetails,
   } = context;
 
-  const handleSubmitUrl = async({productUrl}) => {
+  const handleSubmitUrl = async ({ productUrl }) => {
     setLoading(true);
     try {
-        const response = await submitUrl({productUrl});
-        if(response.success){
-            setProductTitle(response.data.title);
-            setPrice(response.data.price);
-        }
-        return response;
+      const response = await submitUrl({ productUrl });
+      if (response.success) {
+        setProductTitle(response.data.title);
+        setPrice(response.data.price);
+      }
+      return response;
     } catch (error) {
-        console.log("Error in handle submit url::", error);
-    }finally{
-        setLoading(false);
+      console.log("Error in handle submit url::", error);
+    } finally {
+      setLoading(false);
     }
-  }
+  };
+
+  const handleMyTrackingDetails = async () => {
+    setLoading(true);
+    try {
+      const response = await myTrackingDetails();
+      if (response.success) {
+        setMyProductTrackingDetails(response.allProductDetails);
+      }
+      console.log(response);
+      return response;
+    } catch (error) {
+      console.log("Error in handle submit url::", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return {
     handleSubmitUrl,
-    loading, 
+    loading,
     productTitle,
-    price
+    price,
+    handleMyTrackingDetails,
+    myProductTrackingDetails
   };
 };

@@ -7,11 +7,13 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [productTitle, setProductTitle] = useState("");
   const [price,setPrice] = useState(0);
+  const [myProductTrackingDetails, setMyProductTrackingDetails] = useState([]);
 
   // loading ko pehle declare karo
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+
     async function fetchUser() {
       try {
         const response = await getMe();
@@ -44,7 +46,9 @@ export const AuthProvider = ({ children }) => {
         productTitle,
         setProductTitle,
         price,
-        setPrice
+        setPrice,
+        myProductTrackingDetails,
+        setMyProductTrackingDetails
       }}
     >
       {children}
